@@ -4,7 +4,7 @@ import numpy as np
 from copy import deepcopy
 import cv2
 import os
-from FaceAnti import FaceAnti
+from RealFace import RealFace
 
 #http://dlib.net/files/dlib_face_recognition_resnet_model_v1.dat
 #http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2
@@ -88,15 +88,12 @@ class FaceRecognitionExample(object):
 #detection_recognition = FaceRecognitionExample(img_1, img_2, img_3)
 #detection_recognition.compare()
 
-## 填空 补齐FaceSpoofing的代码
-class FaceAnti(object):
-	def classify():
 
 if __name__=="__main__":
     # 初始化人脸检测模型
     detector = dlib.get_frontal_face_detector()
     ## 填空 初始化活体检测模型
-    face_spoofing = FaceAnti()
+    face_spoofing = RealFace()
     # 初始化关键点检测模型
     predictor = dlib.shape_predictor(r'./shape_predictor_68_face_landmarks.dat')
     # 初始化人脸特征模型
@@ -133,14 +130,14 @@ if __name__=="__main__":
             ## 活体检测
             is_real = 'real'
             if not face_spoofing.classify(face_align):
-                print(" not humman\n ")     
+                print("fake !!! \n ")     
                 # 框为红色
                 is_real = 'fake'
                 frame=cv2.rectangle(frame,(det.left(),det.top()),(det.right(),det.bottom()),(0,0,255),2)
             # 提取人脸特征
             face_feature=recognition.compute_face_descriptor(face_align)
             # 计算人脸相似度
-            similarity=1-np.linalg.norm(np.array(face_feature)-np.array(face_feature_zmm))
+            similarity=1 - np.linalg.norm(np.array(face_feature)-np.array(face_feature_zmm))
             # 将关键点绘制到人脸上，
             for i in range(68):
                 cv2.putText(frame, str(i), (shape.part(i).x, shape.part(i).y), cv2.FONT_HERSHEY_DUPLEX, 0.3, (0, 255, 255), 1,cv2.LINE_AA)
@@ -149,7 +146,7 @@ if __name__=="__main__":
         # 为了显示出相似度，我们将相似度写到图片上，
         cv2.putText(frame,"similarity=%.5s - %s"%(similarity, is_real),(100,200),cv2.FONT_HERSHEY_DUPLEX, 0.3, (0, 255, 255), 1,cv2.LINE_AA)
         # 显示图片，图片上有矩形框，关键点，以及相似度
-        cv2.imshow("capture", cv2.resize(frame,(y / 3,x / 3)))
+        cv2.imshow("capture", cv2.resize(frame,(y // 3,x // 3)))
         #cv2.imshow("face_align",face_align)
         if cv2.waitKey(100) & 0xff == ord('q'):
             break

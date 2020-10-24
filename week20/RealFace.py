@@ -1,8 +1,7 @@
 import os
 os.environ['CUDA_VISIBLE_DEVICES'] =  '0'
 import sys
-sys.path.append("../week19/week19code-CVPR19-Face-Anti-spoofing/")
-sys.path.append("/media/ouyang/0933e5eb-356b-415d-926e-e1114043a3bc/home/ouyang/RoadtoAI/MultiPatternRecognition/week19/week19code-CVPR19-Face-Anti-spoofing/process")
+# sys.path.append('../week19/week19code-CVPR19-Face-Anti-spoofing/model/backbone')
 from process.data_fusion import *
 from process.augmentation import *
 from metric import *
@@ -11,12 +10,12 @@ from model import FaceBagNet_model_A
 import cv2
 
 
-class FaceAnti:
+class RealFace:
 	def __init__(self):
-		from FaceBagNet_model_A import Net
+		from model.FaceBagNet_model_A import Net
 		self.net = Net(num_class=2, is_first_bn=True)
-		model_path = "./global_min_acer_model.pth"
-		if torch.cuda.is_availabel():
+		model_pth = "./global_min_acer_model.pth"
+		if torch.cuda.is_available():
 			state_dict = torch.load(model_pth, map_location='cuda')
 			
 		else:
@@ -28,7 +27,7 @@ class FaceAnti:
 			new_state_dict[name] = v
 		self.net.load_state_dict(new_state_dict)
 		
-		if torch.cuda.is_availabel():
+		if torch.cuda.is_available():
 			self.net = self.net.cuda()
 		
 		
@@ -55,7 +54,7 @@ class FaceAnti:
 		color = np.concatenate(color, axis=0)
 		
 		image = color
-		image = np.tranpose(image, (0, 3, 1, 2)) # change dims
+		image = np.transpose(image, (0, 3, 1, 2)) # change dims
 		image = image.astype(np.float32)
 		image = image / 255.0
 		input_image = torch.FloatTensor(image)
@@ -68,7 +67,7 @@ class FaceAnti:
 		b, n, c, w, h = input_image.size()
 		input_image = input_image.view(b * n, c, w, h)
 		
-		if torch.cuda.is_availabel():
+		if torch.cuda.is_available():
 			input_image = input_image.cuda()
 		
 		with torch.no_grad():
@@ -83,9 +82,9 @@ class FaceAnti:
 			
 			
 if __name__ == '__main__':
-	FA = FaceAnti()
+	check = RealFace()
 	image = cv2.imread('./humanFace.jpg', 1)
-	FA.detect(img)
+	check.detect(image)
 	
 			
 			
