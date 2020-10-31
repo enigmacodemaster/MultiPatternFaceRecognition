@@ -62,7 +62,11 @@ class Resnet18Triplet(nn.Module):
         self.model = models.resnet18(pretrained = pretrained) # 预训练好的resnet18模型
         input_features_fc_layer = self.model.fc.in_features
         # Output embedding
-        self.model.fc = nn.Linear(input_features_fc_layer, embedding_dimension) # 替换models中间的一些结构，模型的剪裁
+        # self.model.fc = nn.Linear(input_features_fc_layer, embedding_dimension) # 替换models中间的一些结构，模型的剪裁
+        self.model.fc = nn.Sequential(
+        		nn.Linear(2048, input_features_fc_layer),
+        		nn.Linear(input_features_fc_layer, embedding_dimension)
+        )
 
     def l2_norm(self, input):
         """Perform l2 normalization operation on an input vector.
